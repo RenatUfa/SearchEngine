@@ -1,3 +1,4 @@
+#include "ConverterJson.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -11,23 +12,15 @@
 #include <nlohmann/json.hpp>
 
 
-#include "InvertedIndex.hpp"
-#include "SearchServer.hpp"
-#include "Entry.hpp"
 
-using json = nlohmann::json;
+
 using namespace std;
+using json = nlohmann::json;
 
 
 
-class ConverterJSON
-{
-private:
-    const string configFile = "config.json";
-    const string requestsFile = "requests.json";
-    const string answersFile = "answers.json";
 
-    json loadJSON(const string& filename)
+    json ConverterJSON::loadJSON(const string& filename)
     {
         ifstream file(filename);
         if (!file.is_open())
@@ -39,23 +32,23 @@ private:
         return j;
     }
 
-    // MРµС‚РѕРґ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅРѕРіРѕ С„Р°Р№Р»Р°
-    void createConfigFile()
+    // Mетод для создания конфигурационного файла
+    void ConverterJSON::createConfigFile()
     {
         json config;
 
-        // РЎРѕР·РґР°РµРј РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ
+        // Создаем конфигурацию
         config["config"]["name"] = "SearchEngine";
         config["config"]["version"] = "0.1";
         config["config"]["max_responses"] = 5;
 
-        // Р—Р°РїСЂР°С€РёРІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ С„Р°Р№Р»РѕРІ
+        // Запрашиваем количество файлов
         int fileCount;
         cout << "Enter number of files to analyze: ";
         cin >> fileCount;
-        cin.ignore(); 
+        cin.ignore();
 
-        // Р—Р°РїСЂР°С€РёРІР°РµРј РїСѓС‚Рё Рє С„Р°Р№Р»Р°Рј
+        // Запрашиваем пути к файлам
         vector<string> files;
         for (int i = 0; i < fileCount; i++)
         {
@@ -65,10 +58,10 @@ private:
             files.push_back(filePath);
         }
 
-        
+
         config["files"] = files;
 
-        // Р—Р°РїРёСЃС‹РІР°РµРј РІ С„Р°Р№Р»
+        // Записываем в файл
         ofstream file(configFile);
         if (file.is_open())
         {
@@ -82,18 +75,18 @@ private:
         }
     }
 
-    // MРµС‚РѕРґ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р° Р·Р°РїСЂРѕСЃРѕРІ
-    void createRequestsFile()
+    // Mетод для создания файла запросов
+    void ConverterJSON::createRequestsFile()
     {
         json requests;
 
-        // Р—Р°РїСЂР°С€РёРІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїСЂРѕСЃРѕРІ
+        // Запрашиваем количество запросов
         int requestCount;
         cout << "Enter number of search queries: ";
         cin >> requestCount;
-        cin.ignore(); 
+        cin.ignore();
 
-        // Р—Р°РїСЂР°С€РёРІР°РµРј СЃР°РјРё Р·Р°РїСЂРѕСЃС‹
+        // Запрашиваем сами запросы
         vector<string> requestList;
         for (int i = 0; i < requestCount; i++)
         {
@@ -103,10 +96,10 @@ private:
             requestList.push_back(query);
         }
 
-        // Р”РѕР±Р°РІР»СЏРµРј Р·Р°РїСЂРѕСЃС‹ РІ JSON
+        // Добавляем запросы в JSON
         requests["requests"] = requestList;
 
-        // Р—Р°РїРёСЃС‹РІР°РµРј РІ С„Р°Р№Р»
+        // Записываем в файл
         ofstream file(requestsFile);
         if (file.is_open())
         {
@@ -120,18 +113,8 @@ private:
         }
     }
 
-public:
-    ConverterJSON()
-    {
-        // РџСЂРё СЃРѕР·РґР°РЅРёРё РѕР±СЉРµРєС‚Р° Р·Р°РїСЂР°С€РёРІР°РµРј РґР°РЅРЅС‹Рµ Рё СЃРѕР·РґР°РµРј С„Р°Р№Р»С‹
-       
-        createConfigFile();
-        cout << endl;
-        createRequestsFile();
-       
-    }
 
-    vector<string> GetTextDocuments()
+        vector<string> ConverterJSON::GetTextDocuments()
     {
         try
         {
@@ -187,7 +170,7 @@ public:
         }
     }
 
-    int GetResponsesLimit()
+    int ConverterJSON::GetResponsesLimit()
     {
         try
         {
@@ -199,12 +182,12 @@ public:
         }
         catch (...)
         {
-            // РРіРЅРѕСЂРёСЂСѓРµРј РѕС€РёР±РєРё, РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+            // Игнорируем ошибки, возвращаем значение по умолчанию
         }
         return 5;
     }
 
-    vector<string> GetRequests()
+    vector<string>ConverterJSON::GetRequests()
     {
         try
         {
@@ -226,7 +209,7 @@ public:
         return {};
     }
 
-    void putAnswers(const vector<vector<RelativeIndex>>& answers)
+    void ConverterJSON::putAnswers(const vector<vector<RelativeIndex>>& answers)
     {
         json output;
         output["answers"] = json::object();
@@ -266,59 +249,4 @@ public:
         {
             cerr << "Error: Cannot create answers.json" << endl;
         }
-    }
-};
-
-
-
-int main()
-{
-    try
-    {
-           
-       
-        ConverterJSON converter;  
-
-        int limit = converter.GetResponsesLimit();
-        cout << "Responses limit: " << limit << endl;
-
-        vector<string> documents = converter.GetTextDocuments();
-        cout << "Loaded " << documents.size() << " documents" << endl;
-
-        vector<string> queryRequests = converter.GetRequests();
-        cout << "Loaded " << queryRequests.size() << " requests" << endl;
-
-        if (!documents.empty() && !queryRequests.empty())
-        {
-            InvertedIndex idx;
-            idx.UpdateDocumentBase(documents);
-
-            SearchServer srv(idx);
-            auto searchResults = srv.search(queryRequests);
-
-            converter.putAnswers(searchResults);
-
-            // Р’С‹РІРѕРґ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
-            for (size_t i = 0; i < searchResults.size(); i++)
-            {
-                cout << "Request " << i + 1 << ": ";
-                if (searchResults[i].empty())
-                {
-                    cout << "No results" << endl;
-                }
-                else
-                {
-                    cout << searchResults[i].size() << " results" << endl;
-                }
-            }
-        }
-
-    }
-    catch (const exception& e)
-    {
-        cerr << "Error: " << e.what() << endl;
-        return 1;
-    }
-
-    return 0;
-}
+    };
