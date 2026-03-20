@@ -1,0 +1,12 @@
+{
+  "config": {
+    "max_responses": 5,
+    "name": "SearchEngine",
+    "version": "0.1"
+  },
+  "files": [
+    "D:\\Scillbox\\final\\1.txt",
+    "D:\\Scillbox\\final\\2.txt",
+    "D:\\Scillbox\\final\\3.txt"
+  ]
+}
